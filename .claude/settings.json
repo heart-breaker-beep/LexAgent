@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "WebFetch(domain:www.siliconflow.com)"
+    ],
+    "additionalDirectories": [
+      "D:/AgentProjects/Legal-main/.claude",
+      "D:/AgentProjects/Legal-main/docs"
+    ]
+  }
+}
