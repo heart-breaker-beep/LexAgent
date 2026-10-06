@@ -66,10 +66,9 @@ npm run build
 
 | 项目 | 状态 |
 | --- | --- |
-| 根目录 README | 已新增，包含项目定位、截图、快速开始、测试、目录结构 |
 | 项目截图 | 已保存到 `docs/public/screenshots/` |
-| 架构说明 | 已有 `PROJECT_INFO.md`、`docs/guide/architecture.md` |
-| 测试说明 | README 和本报告均包含测试命令与结果 |
+| 架构说明 | 已有 `docs/guide/architecture.md` |
+| 测试说明 | 本报告包含测试命令与结果 |
 
 ## 清理说明
 
