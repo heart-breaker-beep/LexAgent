@@ -1,0 +1,59 @@
+# 一键部署：docker compose up -d --build
+#
+# 前置条件（重要）：
+#   宿主机 Ollama 默认只监听 127.0.0.1，容器访问不到。
+#   需先设置环境变量并重启 Ollama：
+#       Windows:  setx OLLAMA_HOST 0.0.0.0    然后退出托盘里的 Ollama 再重新启动
+#       Linux:    OLLAMA_HOST=0.0.0.0 ollama serve
+#   校验：netstat -ano | findstr 11434  应显示 0.0.0.0:11434，而非 127.0.0.1:11434
+
+services:
+  legal-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: legal-agent:latest
+    container_name: legal-agent
+
+    # 你本地的 .env 会被整体注入（模型名、阈值、配额等全部生效）
+    env_file:
+      - .env
+
+    # 以下变量覆盖 .env 中的值：容器内 localhost 指向容器自己，
+    # 必须改指宿主机，否则连不上 Ollama。
+    environment:
+      # 容器 → 宿主机 Ollama
+      LLM_BASE_URL_OVERRIDE: "http://host.docker.internal:11434/v1"
+      EMBEDDING_BASE_URL: "http://host.docker.internal:11434/v1"
+      HYDE_LLM_BASE_URL: "http://host.docker.internal:11434/v1"
+      # 防止宿主机的代理设置被带进容器后劫持 host.docker.internal
+      NO_PROXY: "localhost,127.0.0.1,::1,host.docker.internal"
+      no_proxy: "localhost,127.0.0.1,::1,host.docker.internal"
+
+    # Docker Desktop（Windows/macOS）自带 host.docker.internal，无需配置。
+    # 若在原生 Linux 上部署，取消下面两行的注释：
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+
+    ports:
+      - "8000:8000"
+
+    # 命名卷：首次创建时 Docker 会把镜像里的 /app/data 复制进来（含 data/laws），
+    # 之后索引、SQLite、上传文件都留在这里，重建容器不丢数据。
+    # 注意：不要改成 ./data:/app/data 这种绑定挂载，否则宿主机空目录会覆盖掉 data/laws。
+    volumes:
+      - legal-agent-data:/app/data
+
+    restart: unless-stopped
+
+    # 首次启动需构建法条索引（调用 Ollama 做 embedding），可能数分钟
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 600s
+      retries: 5
+
+volumes:
+  legal-agent-data:

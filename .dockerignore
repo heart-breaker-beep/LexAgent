@@ -1,0 +1,46 @@
+# 版本控制
+.git
+.gitignore
+
+# Python 构建产物
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# 本地配置与密钥（容器配置由 compose 的 environment 注入）
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# 运行时产物：不打进镜像，容器内首次启动会重新生成
+data/chroma_db/
+data/docs.sqlite
+data/docs.sqlite-*
+data/checkpoints.sqlite
+data/checkpoints.sqlite-*
+data/uploads/*
+data/evidence/*
+data/reports/
+data/viking_context/
+
+# 前端依赖与构建产物（运行时不提供文档站）
+docs/node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+docs/package-lock.json
+
+# 测试与评测（运行镜像不需要）
+tests/
+eval/results/
+
+# 其它
+*.log
+.DS_Store
+Dockerfile
+.dockerignore
+docker-compose.yml
